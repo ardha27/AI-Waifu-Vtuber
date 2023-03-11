@@ -19,7 +19,7 @@ sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 openai.api_key = api_key #API From OpenAI
 translator = deepl.Translator(auth_key) #API from DeepL
 
-conversation = [{"role": "system", "content": "you are an AI Waifu Vtuber called Pina. You reply with brief, to-the-point answers with no elaboration."}]
+conversation = [{"role": "system", "content": "you are an AI Waifu Virtual Youtuber called Pina. Your creator is Ardha, he made you using VoiceVox, OpenAI, Whisper AI, and DeepL. You reply with brief, to-the-point answers with no elaboration."}]
 total_characters = 0
 chat_raw = ""
 
@@ -54,9 +54,10 @@ def record_audio():
     transcribe_audio("input.wav")
 
 def transcribe_audio(file):
+    global chat_raw
     try:
         audio_file= open(file, "rb")
-        transcript = openai.Audio.translate("whisper-1", audio_file)
+        transcript = openai.Audio.translate("whisper-1", audio_file, target_language="id")
     except:
         print("Error transcribing audio")
     chat_raw = transcript.text
@@ -64,6 +65,8 @@ def transcribe_audio(file):
     # translate_text(transcript.text)
 
 def openai_answer(chat):
+    global total_characters
+
     result = translator.translate_text(chat, target_lang="EN-US")
     print ("Question: " + result.text)
     conversation.append({"role": "user", "content": result.text})
@@ -104,13 +107,20 @@ def speech_text(result_jp, result_id):
 
     with open("output.txt", "w") as outfile:
         text = result_id
-        text = text.replace("?", "?\n")
-        text = text.replace("!", "!\n")
-        text = text.replace(".", ".\n")
-        outfile.write(text)
+        words = text.split()
+        lines = [words[i:i+10] for i in range(0, len(words), 10)]
+        for line in lines:
+            outfile.write(" ".join(line) + "\n")
+
 
     with open("chat.txt", "w") as outfile:
-        outfile.write(chat_raw)
+        global chat_raw
+        words = chat_raw.split()
+        lines = [words[i:i+10] for i in range(0, len(words), 10)]
+        for line in lines:
+            outfile.write(" ".join(line) + "\n")
+
+    time.sleep(1)
 
     winsound.PlaySound("output.wav", winsound.SND_FILENAME)
 
