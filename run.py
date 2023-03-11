@@ -125,7 +125,7 @@ if __name__ == "__main__":
     mode = input("Mode (1-Mic, 2-Youtube Live): ")
 
     if mode == "1":
-        print("Press Right Shift to record audio")
+        print("Press and Hold Right Shift to record audio")
         while True:
             if keyboard.is_pressed('RIGHT_SHIFT'):
                 record_audio()
