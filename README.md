@@ -3,8 +3,7 @@
 
 This project is inspired by shioridotdev and utilizes various technologies such as VoiceVox Engine, DeepL, Whisper OpenAI, and VtubeStudio to create an AI waifu virtual YouTuber.
 
-
-
+![My Remote Image](https://github.com/ardha27/AI-Waifu-Vtuber/blob/master/ss.png?raw=true)
 
 ## Technologies Used
 
