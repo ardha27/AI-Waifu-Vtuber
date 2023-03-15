@@ -10,13 +10,15 @@ Link : https://www.youtube.com/shorts/_mKVr3ZaM9Q
 
 ## Technologies Used
 
- - VoiceVox Engine
- - DeepL
- - Whisper OpenAI
+ - VoiceVox Engine [https://github.com/VOICEVOX/voicevox_engine]
+ - DeepL [https://www.deepl.com/fr/account/summary]
+ - Whisper OpenAI [https://platform.openai.com/account/api-keys]
  - VtubeStudio
 
 
 ## Installation
+
+You must use your own OpenAI and DeepL API KEY
 
 To use this project, you will need to download the VoiceVox Engine from their GitHub page. You will also need to capture desktop audio using Virtual Cable and use it as input on VtubeStudio microphone.
 
