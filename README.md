@@ -5,6 +5,9 @@ This project is inspired by shioridotdev and utilizes various technologies such 
 
 ![My Remote Image](https://github.com/ardha27/AI-Waifu-Vtuber/blob/master/ss.png?raw=true)
 
+## Demo
+Link : ![Demo](https://www.tiktok.com/@ardha27/video/7209300442017221914?lang=en-US)
+
 ## Technologies Used
 
  - VoiceVox Engine
