@@ -131,7 +131,7 @@ def translate_text(text):
     result_id = translate_google(text, "EN", "ID")
     print("ID Answer: " + result_id)
     # result_jp will be the string to be converted to audio
-    result_jp = translate_google(text, "ID", "JA")
+    result_jp = translate_google(text, "EN", "JA")
     print("JP Answer: " + result_jp)
     speech_text(result_jp, result_id)
 
