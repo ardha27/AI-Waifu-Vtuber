@@ -6,8 +6,8 @@ This project is inspired by shioridotdev and utilizes various technologies such 
 ![My Remote Image](https://github.com/ardha27/AI-Waifu-Vtuber/blob/master/ss.png?raw=true)
 
 ## Demo
-Link : https://www.youtube.com/shorts/_mKVr3ZaM9Q
-Live Test : https://youtu.be/h6UEgJxH1-E?t=1616
+ - Demo : https://www.youtube.com/shorts/_mKVr3ZaM9Q
+ - Live Test : https://youtu.be/h6UEgJxH1-E?t=1616
 
 ## Technologies Used
 
