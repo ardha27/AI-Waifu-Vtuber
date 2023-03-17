@@ -8,6 +8,7 @@ This project is inspired by shioridotdev and utilizes various technologies such 
 ## Demo
  - Demo : https://www.youtube.com/shorts/_mKVr3ZaM9Q
  - Live Test : https://youtu.be/h6UEgJxH1-E?t=1616
+ - Code Explain : https://youtu.be/qpNG9qrcmrQ
 
 ## Technologies Used
 
