@@ -28,6 +28,7 @@ with open("lore.txt", "r", encoding="utf-8") as f:
 
 # initialize the conversation history to make your assistant have a short-term memory
 conversation = [{"role": "system", "content": lore}]
+mode = 0
 total_characters = 0
 chat = ""
 chat_now = ""
@@ -69,21 +70,23 @@ def transcribe_audio(file):
     global chat_now
     try:
         audio_file= open(file, "rb")
-        transcript = openai.Audio.transcribe("whisper-1", audio_file, target_language="id")
+        transcript = openai.Audio.transcribe("whisper-1", audio_file)
         chat_now = transcript.text
+        print ("Question: " + chat_now)
+
+        # Optional: translate the user's input to English. If your are an English speaker, you can skip this step
+        # I translate the user's input to English because it will be easier for the translator to translate from EN to JP, compared to translating from ID to JP
+        result = translate_google(chat_now, "ID", "EN")
+        conversation.append({"role": "user", "content": result})
+        openai_answer()
     except:
         print("Error transcribing audio")
         return
-    openai_answer(chat_now)
 
 # function to get an answer from OpenAI
-def openai_answer(chat):
+def openai_answer():
     global total_characters, conversation
-    # Optional: translate the user's input to English. If your are an English speaker, you can skip this step
-    # I translate the user's input to English because it will be easier for the translator to translate from EN to JP, compared to translating from ID to JP
-    result = translate_google(chat, "ID", "EN")
-    print ("Question: " + result)
-    conversation.append({"role": "user", "content": result})
+
     # get the total number of characters in the conversation history
     total_characters = sum(len(d['content']) for d in conversation)
 
@@ -129,7 +132,7 @@ def translate_text(text):
     print("ID Answer: " + result_id)
     # result_jp will be the string to be converted to audio
     result_jp = translate_google(text, "ID", "JA")
-    print("JP Answer: " + text)
+    print("JP Answer: " + result_jp)
     speech_text(result_jp, result_id)
 
 def speech_text(result_jp, result_id):
