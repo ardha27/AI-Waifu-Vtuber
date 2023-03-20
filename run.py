@@ -73,15 +73,15 @@ def transcribe_audio(file):
         transcript = openai.Audio.transcribe("whisper-1", audio_file)
         chat_now = transcript.text
         print ("Question: " + chat_now)
-
-        # Optional: translate the user's input to English. If your are an English speaker, you can skip this step
-        # I translate the user's input to English because it will be easier for the translator to translate from EN to JP, compared to translating from ID to JP
-        result = translate_google(chat_now, "ID", "EN")
-        conversation.append({"role": "user", "content": result})
-        openai_answer()
     except:
         print("Error transcribing audio")
         return
+
+    # Optional: translate the user's input to English. If your are an English speaker, you can skip this step
+    # I translate the user's input to English because it will be easier for the translator to translate from EN to JP, compared to translating from ID to JP
+    result = translate_google(chat_now, "ID", "EN")
+    conversation.append({"role": "user", "content": result})
+    openai_answer()
 
 # function to get an answer from OpenAI
 def openai_answer():
