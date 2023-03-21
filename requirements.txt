@@ -1,0 +1,10 @@
+alkana==0.0.3
+googletrans==4.0.0rc1
+keyboard==0.13.5
+MeCab==0.996.3
+openai==0.27.0
+pandas==1.4.2
+PyAudio==0.2.11
+pytchat==0.5.5
+requests==2.28.2
+unidic==1.1.0
