@@ -7,4 +7,5 @@ pandas==1.4.2
 PyAudio==0.2.11
 pytchat==0.5.5
 requests==2.28.2
+torch==1.12.1
 unidic==1.1.0

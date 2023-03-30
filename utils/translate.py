@@ -34,7 +34,11 @@ def translate_deeplx(text, source, target):
 
     return translated_text
 
-def translate_google(text, source, target):
-    translator = googletrans.Translator()
-    result = translator.translate(text, src=source, dest=target)
-    return result.text
+def translate_google(text, target):
+    try:
+        translator = googletrans.Translator()
+        result = translator.translate(text, dest=target)
+        return result.text
+    except:
+        print("Error translate")
+        return
