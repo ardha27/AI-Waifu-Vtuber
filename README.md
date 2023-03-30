@@ -15,7 +15,7 @@ This project is inspired by shioridotdev and utilizes various technologies such 
 
 ## Technologies Used
 
- - [VoiceVox Engine](https://github.com/VOICEVOX/voicevox_engine)
+ - [VoiceVox Engine](https://hub.docker.com/r/voicevox/voicevox_engine)
  - [DeepL](https://www.deepl.com/fr/account/summary)
  - [Whisper OpenAI](https://platform.openai.com/account/api-keys)
  - [Seliro TTS](https://github.com/snakers4/silero-models#text-to-speech)
