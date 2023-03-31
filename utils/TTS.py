@@ -2,7 +2,7 @@ import os
 import torch
 import requests
 import urllib.parse
-from katakana import *
+from utils.katakana import *
 
 # https://github.com/snakers4/silero-models#text-to-speech
 def silero_tts(tts, language, model, speaker):
