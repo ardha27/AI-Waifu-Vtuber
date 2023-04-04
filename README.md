@@ -1,7 +1,6 @@
 # Support
 
-if you find this Repo was helpful don't forget to give it a star. Thank you
-Supports me : [Ko-fi](https://ko-fi.com/ardhach)
+if you find this Repo was helpful don't forget to give it a star. Thank you. Supports me on : [Ko-fi](https://ko-fi.com/ardhach)
 
 # Update
 
@@ -17,6 +16,7 @@ This project is inspired by shioridotdev and utilizes various technologies such 
  - [Demo](https://www.youtube.com/shorts/_mKVr3ZaM9Q)
  - [Live Test](https://youtu.be/h6UEgJxH1-E?t=1616)
  - [Code Explain](https://youtu.be/qpNG9qrcmrQ)
+ - [Clip](https://www.youtube.com/watch?v=qTkESIBd5Qk)
 
 ## Technologies Used
 
