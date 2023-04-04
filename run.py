@@ -69,9 +69,9 @@ def transcribe_audio(file):
     try:
         audio_file= open(file, "rb")
         # Translating the audio to English
-        transcript = openai.Audio.translate("whisper-1", audio_file)
+        # transcript = openai.Audio.translate("whisper-1", audio_file)
         # Transcribe the audio to detected language
-        # transcript = openai.Audio.transcribe("whisper-1", audio_file)
+        transcript = openai.Audio.transcribe("whisper-1", audio_file)
         chat_now = transcript.text
         print ("Question: " + chat_now)
     except:
@@ -85,6 +85,20 @@ def transcribe_audio(file):
 # function to get an answer from OpenAI
 def openai_answer():
     global total_characters, conversation
+
+    for item in conversation:
+        if isinstance(item, dict) and "content" in item:
+            content = item["content"]
+            total_characters += len(content)
+
+    while total_characters > 4000:
+        try:
+            # print(total_characters)
+            # print(len(conversation))
+            conversation.pop(2)
+            total_characters -= len(conversation[2]["content"])
+        except:
+            print("Error: Prompt too long!")
 
     with open("conversation.json", "w", encoding="utf-8") as f:
         # Write the message data to the file in JSON format
@@ -132,19 +146,28 @@ def get_livechat(video_id):
 def translate_text(text):
     global is_Speaking
     # subtitle will act as subtitle for the viewer
-    subtitle = translate_google(text, "ID")
-    print("ID Answer: " + subtitle)
+    # subtitle = translate_google(text, "ID")
     # tts will be the string to be converted to audio
-    tts = translate_google(text, "JA")
-    print("JP Answer: " + tts)
+    detect = detect_google(text)
+    tts = translate_deeplx(text, f"{detect}", "JA")
+    # tts_en = translate_google(text, f"{detect}", "EN")
+    try:
+        # print("ID Answer: " + subtitle)
+        print("JP Answer: " + tts)
+        # print("EN Answer: " + tts_en)
+    except:
+        print("Error translating text")
+        return
 
+    # Choose between the available TTS engines
     # Japanese TTS
-    # voicevox_tts(tts)
+    voicevox_tts(tts)
+
     # Silero TTS, Silero TTS can generate English, Russian, French, Hindi, Spanish, German, etc. Uncomment the line below. Make sure the input is in that language
-    silero_tts(text, "en", "v3_en", "en_21")
+    # silero_tts(tts_en, "en", "v3_en", "en_21")
 
     # Generate Subtitle
-    generate_subtitle(chat_now, subtitle)
+    generate_subtitle(chat_now, text)
 
     time.sleep(1)
 

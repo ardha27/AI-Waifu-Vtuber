@@ -11,8 +11,8 @@ def getIdentity(identityPath):
     return {"role": "user", "content": identityContext}
     
 def getPrompt():
-    prompt = []
     total_len = 0
+    prompt = []
     prompt.append(getIdentity("characterConfig/Pina/identity.txt"))
     prompt.append({"role": "system", "content": f"Below is conversation history.\n"})
 
@@ -38,8 +38,14 @@ def getPrompt():
             content = item["content"]
             total_len += len(content)
     
-    while total_len > 4095:
-        prompt.pop(2)
+    while total_len > 4000:
+        try:
+            # print(total_len)
+            # print(len(prompt))
+            prompt.pop(2)
+            total_len -= len(prompt[2]["content"])
+        except:
+            print("Error: Prompt too long!")
 
     # total_characters = sum(len(d['content']) for d in prompt)
     # print(f"Total characters: {total_characters}")
@@ -48,5 +54,5 @@ def getPrompt():
 
 if __name__ == "__main__":
     prompt = getPrompt()
-    print(prompt[2])
+    print(prompt)
     print(len(prompt))
