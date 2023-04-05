@@ -9,11 +9,14 @@ import keyboard
 import wave
 import threading
 import json
+import socket
+from emoji import demojize
 from config import *
 from utils.translate import *
 from utils.TTS import *
 from utils.subtitle import *
 from utils.promptMaker import *
+from utils.twitch_config import *
 
 # to help the CLI write unicode characters to the terminal
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
@@ -32,6 +35,7 @@ chat_now = ""
 chat_prev = ""
 is_Speaking = False
 owner_name = "Ardha"
+blacklist = ["Nightbot", "streamelements"]
 
 # function to get the user's input audio
 def record_audio():
@@ -119,7 +123,7 @@ def openai_answer():
     translate_text(message)
 
 # function to capture livechat from youtube
-def get_livechat(video_id):
+def yt_livechat(video_id):
     try:
         global chat
 
@@ -128,7 +132,7 @@ def get_livechat(video_id):
         while live.is_alive():
             for c in live.get().sync_items():
                 # Ignore chat from the streamer and Nightbot, change this if you want to include the streamer's chat
-                if c.author.name == 'Nightbot':
+                if c.author.name in blacklist:
                     continue
                 # if not c.message.startswith("!") and c.message.startswith('#'):
                 if not c.message.startswith("!"):
@@ -142,14 +146,47 @@ def get_livechat(video_id):
     except KeyboardInterrupt:
         print("Program stopped by user")
 
+def twitch_livechat():
+    global chat
+    sock = socket.socket()
+
+    sock.connect((server, port))
+
+    sock.send(f"PASS {token}\n".encode('utf-8'))
+    sock.send(f"NICK {nickname}\n".encode('utf-8'))
+    sock.send(f"JOIN {channel}\n".encode('utf-8'))
+
+    regex = r":(\w+)!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :(.+)"
+
+    while True:
+        try:
+            resp = sock.recv(2048).decode('utf-8')
+            if not user in resp and not resp.startswith("!"):
+                resp = demojize(resp)
+                match = re.match(regex, resp)
+
+                username = match.group(1)
+                message = match.group(2)
+
+                if username in blacklist:
+                    continue
+                
+                chat = username + ' said ' + message
+                print(chat)
+
+        except:
+            print("Error receiving chat")
+
 # translating is optional
 def translate_text(text):
     global is_Speaking
     # subtitle will act as subtitle for the viewer
     # subtitle = translate_google(text, "ID")
+
     # tts will be the string to be converted to audio
     detect = detect_google(text)
-    tts = translate_deeplx(text, f"{detect}", "JA")
+    tts = translate_google(text, f"{detect}", "JA")
+    # tts = translate_deeplx(text, f"{detect}", "JA")
     # tts_en = translate_google(text, f"{detect}", "EN")
     try:
         # print("ID Answer: " + subtitle)
@@ -200,7 +237,7 @@ if __name__ == "__main__":
     try:
         # You can change the mode to 1 if you want to record audio from your microphone
         # or change the mode to 2 if you want to capture livechat from youtube
-        mode = input("Mode (1-Mic, 2-Youtube Live): ")
+        mode = input("Mode (1-Mic, 2-Youtube Live, 3-Twitch Live): ")
 
         if mode == "1":
             print("Press and Hold Right Shift to record audio")
@@ -209,11 +246,18 @@ if __name__ == "__main__":
                     record_audio()
             
         elif mode == "2":
-                live_id = input("Livestream ID: ")
-                # Threading is used to capture livechat and answer the chat at the same time
-                t = threading.Thread(target=preparation)
-                t.start()
-                get_livechat(live_id)
+            live_id = input("Livestream ID: ")
+            # Threading is used to capture livechat and answer the chat at the same time
+            t = threading.Thread(target=preparation)
+            t.start()
+            yt_livechat(live_id)
+
+        elif mode == "3":
+            # Threading is used to capture livechat and answer the chat at the same time
+            print("To use this mode, make sure to change utils/twitch_config.py to your own config")
+            t = threading.Thread(target=preparation)
+            t.start()
+            twitch_livechat()
     except KeyboardInterrupt:
         print("Stopped")
 
