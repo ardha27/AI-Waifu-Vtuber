@@ -155,7 +155,7 @@ from utils.katakana import *
 katakana_text = katakana_converter(tts)
 ```
 
-delete this line on `run.py` and just pass the `tts` to next line of the code
+delete this line on `utils/TTS.py` and just pass the `tts` to next line of the code
 
 ## Credits
 
