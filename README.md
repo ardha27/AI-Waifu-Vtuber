@@ -148,14 +148,14 @@ Another option to solve this problem, you can upgrade the OpenAI library to the 
 
 2. Mecab Error
 
-this library is a little bit tricky to install. If you facing this problem, you can just delete and don't use the `katakana_converter` on `utils/TTS.py`. That function is optional, you can run the program without it
+this library is a little bit tricky to install. If you facing this problem, you can just delete and don't use the `katakana_converter` on `utils/TTS.py`. That function is optional, you can run the program without it. Delete this two line on `utils/TTS.py`  
 
 ```
 from utils.katakana import *
 katakana_text = katakana_converter(tts)
 ```
 
-delete this line on `utils/TTS.py` and just pass the `tts` to next line of the code
+and just pass the `tts` to next line of the code
 
 ```
 params_encoded = urllib.parse.urlencode({'text': tts, 'speaker': 46})
