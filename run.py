@@ -90,17 +90,14 @@ def transcribe_audio(file):
 def openai_answer():
     global total_characters, conversation
 
-    for item in conversation:
-        if isinstance(item, dict) and "content" in item:
-            content = item["content"]
-            total_characters += len(content)
+    total_characters = sum(len(d['content']) for d in conversation)
 
     while total_characters > 4000:
         try:
             # print(total_characters)
             # print(len(conversation))
             conversation.pop(2)
-            total_characters -= len(conversation[2]["content"])
+            total_characters = sum(len(d['content']) for d in conversation)
         except:
             print("Error: Prompt too long!")
 
@@ -124,27 +121,28 @@ def openai_answer():
 
 # function to capture livechat from youtube
 def yt_livechat(video_id):
-    try:
         global chat
 
         live = pytchat.create(video_id=video_id)
         # while live.is_alive():
-        while live.is_alive():
-            for c in live.get().sync_items():
-                # Ignore chat from the streamer and Nightbot, change this if you want to include the streamer's chat
-                if c.author.name in blacklist:
-                    continue
-                # if not c.message.startswith("!") and c.message.startswith('#'):
-                if not c.message.startswith("!"):
-                    # Remove emojis from the chat
-                    chat_raw = re.sub(r':[^\s]+:', '', c.message)
-                    # chat_author makes the chat look like this: "Nightbot: Hello". So the assistant can respond to the user's name
-                    chat = c.author.name + ' berkata ' + chat_raw
-                    print(chat)
-                    
-                time.sleep(1)
-    except KeyboardInterrupt:
-        print("Program stopped by user")
+        while True:
+            try:
+                for c in live.get().sync_items():
+                    # Ignore chat from the streamer and Nightbot, change this if you want to include the streamer's chat
+                    if c.author.name in blacklist:
+                        continue
+                    if not c.message.startswith("!") and c.message.startswith('#'):
+                    # if not c.message.startswith("!"):
+                        # Remove emojis from the chat
+                        chat_raw = re.sub(r':[^\s]+:', '', c.message)
+                        chat_raw = chat_raw.replace('#', '')
+                        # chat_author makes the chat look like this: "Nightbot: Hello". So the assistant can respond to the user's name
+                        chat = c.author.name + ' berkata ' + chat_raw
+                        print(chat)
+                        
+                    time.sleep(1)
+            except:
+                print("Error receiving chat")
 
 def twitch_livechat():
     global chat
@@ -161,7 +159,11 @@ def twitch_livechat():
     while True:
         try:
             resp = sock.recv(2048).decode('utf-8')
-            if not user in resp and not resp.startswith("!"):
+
+            if resp.startswith('PING'):
+                    sock.send("PONG\n".encode('utf-8'))
+
+            elif not user in resp and not resp.startswith("!"):
                 resp = demojize(resp)
                 match = re.match(regex, resp)
 
@@ -187,21 +189,21 @@ def translate_text(text):
     detect = detect_google(text)
     tts = translate_google(text, f"{detect}", "JA")
     # tts = translate_deeplx(text, f"{detect}", "JA")
-    # tts_en = translate_google(text, f"{detect}", "EN")
+    tts_en = translate_google(text, f"{detect}", "EN")
     try:
         # print("ID Answer: " + subtitle)
         print("JP Answer: " + tts)
-        # print("EN Answer: " + tts_en)
+        print("EN Answer: " + tts_en)
     except:
         print("Error translating text")
         return
 
     # Choose between the available TTS engines
     # Japanese TTS
-    voicevox_tts(tts)
+    # voicevox_tts(tts)
 
     # Silero TTS, Silero TTS can generate English, Russian, French, Hindi, Spanish, German, etc. Uncomment the line below. Make sure the input is in that language
-    # silero_tts(tts_en, "en", "v3_en", "en_21")
+    silero_tts(tts_en, "en", "v3_en", "en_21")
 
     # Generate Subtitle
     generate_subtitle(chat_now, text)

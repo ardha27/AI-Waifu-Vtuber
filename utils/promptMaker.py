@@ -18,9 +18,7 @@ def getPrompt():
 
     with open("conversation.json", "r") as f:
         data = json.load(f)
-
     history = data["history"]
-
     for message in history[:-1]:
         prompt.append(message)
 
@@ -33,17 +31,14 @@ def getPrompt():
 
     prompt.append(history[-1])
 
-    for item in prompt:
-        if isinstance(item, dict) and "content" in item:
-            content = item["content"]
-            total_len += len(content)
+    total_len = sum(len(d['content']) for d in prompt)
     
     while total_len > 4000:
         try:
             # print(total_len)
             # print(len(prompt))
             prompt.pop(2)
-            total_len -= len(prompt[2]["content"])
+            total_len = sum(len(d['content']) for d in prompt)
         except:
             print("Error: Prompt too long!")
 
