@@ -78,8 +78,8 @@ def transcribe_audio(file):
         transcript = openai.Audio.transcribe("whisper-1", audio_file)
         chat_now = transcript.text
         print ("Question: " + chat_now)
-    except:
-        print("Error transcribing audio")
+    except Exception as e:
+        print("Error transcribing audio: {0}".format(e))
         return
 
     result = owner_name + " said " + chat_now
@@ -98,8 +98,8 @@ def openai_answer():
             # print(len(conversation))
             conversation.pop(2)
             total_characters = sum(len(d['content']) for d in conversation)
-        except:
-            print("Error: Prompt too long!")
+        except Exception as e:
+            print("Error removing old messages: {0}".format(e))
 
     with open("conversation.json", "w", encoding="utf-8") as f:
         # Write the message data to the file in JSON format
@@ -124,15 +124,15 @@ def yt_livechat(video_id):
         global chat
 
         live = pytchat.create(video_id=video_id)
-        # while live.is_alive():
-        while True:
+        while live.is_alive():
+        # while True:
             try:
                 for c in live.get().sync_items():
                     # Ignore chat from the streamer and Nightbot, change this if you want to include the streamer's chat
                     if c.author.name in blacklist:
                         continue
-                    if not c.message.startswith("!") and c.message.startswith('#'):
-                    # if not c.message.startswith("!"):
+                    # if not c.message.startswith("!") and c.message.startswith('#'):
+                    if not c.message.startswith("!"):
                         # Remove emojis from the chat
                         chat_raw = re.sub(r':[^\s]+:', '', c.message)
                         chat_raw = chat_raw.replace('#', '')
@@ -141,8 +141,8 @@ def yt_livechat(video_id):
                         print(chat)
                         
                     time.sleep(1)
-            except:
-                print("Error receiving chat")
+            except Exception as e:
+                print("Error receiving chat: {0}".format(e))
 
 def twitch_livechat():
     global chat
@@ -163,7 +163,7 @@ def twitch_livechat():
             if resp.startswith('PING'):
                     sock.send("PONG\n".encode('utf-8'))
 
-            elif not user in resp and not resp.startswith("!"):
+            elif not user in resp:
                 resp = demojize(resp)
                 match = re.match(regex, resp)
 
@@ -176,8 +176,8 @@ def twitch_livechat():
                 chat = username + ' said ' + message
                 print(chat)
 
-        except:
-            print("Error receiving chat")
+        except Exception as e:
+            print("Error receiving chat: {0}".format(e))
 
 # translating is optional
 def translate_text(text):
@@ -194,8 +194,8 @@ def translate_text(text):
         # print("ID Answer: " + subtitle)
         print("JP Answer: " + tts)
         print("EN Answer: " + tts_en)
-    except:
-        print("Error translating text")
+    except Exception as e:
+        print("Error printing text: {0}".format(e))
         return
 
     # Choose between the available TTS engines
@@ -261,5 +261,6 @@ if __name__ == "__main__":
             t.start()
             twitch_livechat()
     except KeyboardInterrupt:
+        t.join()
         print("Stopped")
 
