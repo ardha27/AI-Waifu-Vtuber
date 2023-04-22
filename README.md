@@ -22,7 +22,7 @@ This project is inspired by shioridotdev and utilizes various technologies such 
 
 ## Technologies Used
 
- - [VoiceVox Docker](https://hub.docker.com/r/voicevox/voicevox_engine) or [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://github.com/SociallyIneptWeeb/LanguageLeapAI/blob/main/src/run_voicevox_colab.ipynb)
+ - [VoiceVox Docker](https://hub.docker.com/r/voicevox/voicevox_engine) or [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/SociallyIneptWeeb/LanguageLeapAI/blob/main/src/run_voicevox_colab.ipynb)
  - [DeepL](https://www.deepl.com/fr/account/summary)
  - [Deeplx](https://github.com/OwO-Network/DeepLX)
  - [Whisper OpenAI](https://platform.openai.com/account/api-keys)
