@@ -1,6 +1,6 @@
 # Support
 
-if you find this Repo was helpful don't forget to give it a star. Thank you. Supports me on : [Ko-fi](https://ko-fi.com/ardhach)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R7AH1FA)
 
 ## Update
 
