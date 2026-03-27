@@ -4,6 +4,75 @@ import requests
 import urllib.parse
 from utils.katakana import *
 
+
+# MiniMax TTS voice IDs
+MINIMAX_VOICES = [
+    "English_Graceful_Lady",
+    "English_Insightful_Speaker",
+    "English_radiant_girl",
+    "English_Persuasive_Man",
+    "English_Lucky_Robot",
+    "Wise_Woman",
+    "cute_boy",
+    "lovely_girl",
+    "Friendly_Person",
+    "Inspirational_girl",
+    "Deep_Voice_Man",
+    "sweet_girl",
+]
+
+
+def minimax_tts(text, voice_id="lovely_girl", model="speech-2.8-hd", output_file="test.wav"):
+    """
+    Generate speech using MiniMax Cloud TTS (T2A v2 API).
+
+    Requires MINIMAX_API_KEY env var or api_key in config.py.
+
+    Args:
+        text: Text to convert to speech.
+        voice_id: One of MINIMAX_VOICES (default: "lovely_girl").
+        model: "speech-2.8-hd" (high quality) or "speech-2.8-turbo" (fast).
+        output_file: Output audio file path.
+    """
+    api_key = os.environ.get("MINIMAX_API_KEY", "")
+    if not api_key:
+        try:
+            from config import api_key as config_key
+            api_key = config_key
+        except ImportError:
+            pass
+
+    if not api_key:
+        raise ValueError("MINIMAX_API_KEY env var or api_key in config.py required for MiniMax TTS")
+
+    url = "https://api.minimax.io/v1/t2a_v2"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "model": model,
+        "text": text,
+        "voice_setting": {
+            "voice_id": voice_id,
+        },
+        "audio_setting": {
+            "format": "mp3",
+        },
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    response.raise_for_status()
+    data = response.json()
+
+    audio_hex = data.get("data", {}).get("audio", "")
+    if not audio_hex:
+        raise RuntimeError(f"MiniMax TTS returned no audio data: {data}")
+
+    audio_bytes = bytes.fromhex(audio_hex)
+    with open(output_file, "wb") as f:
+        f.write(audio_bytes)
+
 # https://github.com/snakers4/silero-models#text-to-speech
 def silero_tts(tts, language, model, speaker):
     device = torch.device('cpu')

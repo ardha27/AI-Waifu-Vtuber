@@ -1,4 +1,3 @@
-import openai
 import winsound
 import sys
 import pytchat
@@ -17,12 +16,18 @@ from utils.TTS import *
 from utils.subtitle import *
 from utils.promptMaker import *
 from utils.twitch_config import *
+from utils.llm_client import LLMClient
 
 # to help the CLI write unicode characters to the terminal
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
-# use your own API Key, you can get it from https://openai.com/. I place my API Key in a separate file called config.py
-openai.api_key = api_key
+# Initialize the LLM client.
+# Configure provider in config.py: set llm_provider to "openai" or "minimax".
+# For OpenAI: set api_key to your OpenAI key (or OPENAI_API_KEY env var).
+# For MiniMax: set api_key to your MiniMax key (or MINIMAX_API_KEY env var).
+_provider = globals().get("llm_provider", "openai")
+_model = globals().get("llm_model", None)
+llm_client = LLMClient(provider=_provider, api_key=api_key, model=_model)
 
 conversation = []
 # Create a dictionary to hold the message data
@@ -67,17 +72,19 @@ def record_audio():
     wf.close()
     transcribe_audio("input.wav")
 
-# function to transcribe the user's audio
+# function to transcribe the user's audio (uses OpenAI Whisper API)
 def transcribe_audio(file):
     global chat_now
     try:
-        audio_file= open(file, "rb")
-        # Translating the audio to English
-        # transcript = openai.Audio.translate("whisper-1", audio_file)
+        from openai import OpenAI as _OpenAI
+        whisper_client = _OpenAI(api_key=api_key)
+        audio_file = open(file, "rb")
         # Transcribe the audio to detected language
-        transcript = openai.Audio.transcribe("whisper-1", audio_file)
+        transcript = whisper_client.audio.transcriptions.create(
+            model="whisper-1", file=audio_file
+        )
         chat_now = transcript.text
-        print ("Question: " + chat_now)
+        print("Question: " + chat_now)
     except Exception as e:
         print("Error transcribing audio: {0}".format(e))
         return
@@ -86,7 +93,7 @@ def transcribe_audio(file):
     conversation.append({'role': 'user', 'content': result})
     openai_answer()
 
-# function to get an answer from OpenAI
+# function to get an answer from the LLM (OpenAI or MiniMax)
 def openai_answer():
     global total_characters, conversation
 
@@ -94,27 +101,17 @@ def openai_answer():
 
     while total_characters > 4000:
         try:
-            # print(total_characters)
-            # print(len(conversation))
             conversation.pop(2)
             total_characters = sum(len(d['content']) for d in conversation)
         except Exception as e:
             print("Error removing old messages: {0}".format(e))
 
     with open("conversation.json", "w", encoding="utf-8") as f:
-        # Write the message data to the file in JSON format
         json.dump(history, f, indent=4)
 
     prompt = getPrompt()
 
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=prompt,
-        max_tokens=128,
-        temperature=1,
-        top_p=0.9
-    )
-    message = response['choices'][0]['message']['content']
+    message = llm_client.chat(prompt, max_tokens=128, temperature=1.0, top_p=0.9)
     conversation.append({'role': 'assistant', 'content': message})
 
     translate_text(message)

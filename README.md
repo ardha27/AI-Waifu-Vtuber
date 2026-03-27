@@ -26,6 +26,7 @@ This project is inspired by shioridotdev and utilizes various technologies such 
  - [DeepL](https://www.deepl.com/fr/account/summary)
  - [Deeplx](https://github.com/OwO-Network/DeepLX)
  - [Whisper OpenAI](https://platform.openai.com/account/api-keys)
+ - [MiniMax AI](https://platform.minimaxi.com/) - Alternative LLM & TTS provider (MiniMax-M2.7, speech-2.8-hd)
  - [Seliro TTS](https://github.com/snakers4/silero-models#text-to-speech)
  - [VB-Cable](https://vb-audio.com/Cable/)
  - VtubeStudio
@@ -39,11 +40,21 @@ This project is inspired by shioridotdev and utilizes various technologies such 
 pip install -r requirements.txt
 ```
 
-2. Create config.py and store your Openai API key
+2. Create config.py and store your API key
 
+**For OpenAI (default):**
 ```
-api_key = 'yourapikey'
+api_key = 'your-openai-api-key'
 ```
+
+**For MiniMax (alternative):**
+```
+api_key = 'your-minimax-api-key'
+llm_provider = 'minimax'          # Use MiniMax as LLM provider
+llm_model = 'MiniMax-M2.7'        # or 'MiniMax-M2.7-highspeed' for faster responses
+```
+
+Available MiniMax models: `MiniMax-M2.7`, `MiniMax-M2.7-highspeed`, `MiniMax-M2.5`, `MiniMax-M2.5-highspeed`. Get your API key from [MiniMax Platform](https://platform.minimaxi.com/).
 
 3. Change the owner name
 
@@ -87,6 +98,18 @@ voicevox_url = 'http://localhost:50021'
 ```
 
 if you want to see the voice list of VoiceVox you can check this [VoiceVox](https://voicevox.hiroshiba.jp) and see the speaker id on `speaker.json` then change it on `utils/TTS.py`. For Seliro Voice sample you can check this [Seliro Samples](https://oobabooga.github.io/silero-samples/index.html)
+
+**MiniMax Cloud TTS (optional):**
+
+You can also use [MiniMax TTS](https://platform.minimaxi.com/) as a cloud-based TTS engine. It supports multiple English and character voices without any local setup. To use it, change the TTS call in `run.py`:
+
+```python
+# MiniMax Cloud TTS (requires MINIMAX_API_KEY env var or api_key in config.py)
+from utils.TTS import minimax_tts
+minimax_tts(tts_en, voice_id="lovely_girl", model="speech-2.8-hd")
+```
+
+Available voices: `lovely_girl`, `sweet_girl`, `cute_boy`, `English_Graceful_Lady`, `English_radiant_girl`, `English_Persuasive_Man`, `Deep_Voice_Man`, `Friendly_Person`, and more. Models: `speech-2.8-hd` (high quality) or `speech-2.8-turbo` (fast).
 
 7. Choose which translator you want to use depends on your use case (optional if you need translation for the answers). Choose between google translate or deeplx. You need to convert the answer to Japanese if you want to use `VoiceVox`, because VoiceVox only accepts input in Japanese. The language answer from OpenAI will depens on your assistant lore language `characterConfig\Pina\identity.txt` and the input language
 
