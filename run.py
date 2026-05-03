@@ -1,4 +1,5 @@
-﻿import openai
+﻿import os
+import openai
 import winsound
 import sys
 import pytchat
@@ -26,9 +27,31 @@ apply_openai_module(openai, LM_STUDIO_BASE_URL, LM_STUDIO_API_KEY)
 assert_lm_studio_reachable(LM_STUDIO_BASE_URL, LM_STUDIO_API_KEY)
 print(f'LLM backend: LM Studio at {LM_STUDIO_BASE_URL} (model: {LM_STUDIO_MODEL})')
 
-print('Loading local Whisper model...')
 model_size = 'base'
-whisper_model = WhisperModel(model_size, device='cuda', compute_type='float16')
+
+
+def _make_whisper(device, compute_type):
+    return WhisperModel(model_size, device=device, compute_type=compute_type)
+
+
+def _init_whisper():
+    pref = os.environ.get('WHISPER_DEVICE', 'auto').lower()
+    if pref == 'cpu':
+        print('Loading Whisper (CPU, WHISPER_DEVICE=cpu)...')
+        return _make_whisper('cpu', 'int8')
+    if pref == 'cuda':
+        print('Loading Whisper (CUDA, WHISPER_DEVICE=cuda)...')
+        return _make_whisper('cuda', 'float16')
+    print('Loading Whisper (auto: CUDA if available)...')
+    try:
+        return _make_whisper('cuda', 'float16')
+    except Exception as e:
+        print('Whisper CUDA init failed ({0}); using CPU.'.format(e))
+        return _make_whisper('cpu', 'int8')
+
+
+print('Loading local Whisper model...')
+whisper_model = _init_whisper()
 print('Whisper model loaded.')
 
 conversation = []
@@ -68,17 +91,40 @@ def record_audio():
     wf.close()
     transcribe_audio('input.wav')
 
+def _transcribe_to_text(path):
+    segments, info = whisper_model.transcribe(path, beam_size=5)
+    text = ''
+    for segment in segments:
+        text += segment.text
+    return text
+
+
 def transcribe_audio(file):
-    global chat_now
+    global chat_now, whisper_model
     try:
-        segments, info = whisper_model.transcribe(file, beam_size=5)
-        chat_now = ''
-        for segment in segments:
-            chat_now += segment.text
-        print ('Question: ' + chat_now)
+        chat_now = _transcribe_to_text(file)
     except Exception as e:
-        print('Error transcribing audio locally: {0}'.format(e))
-        return
+        msg = str(e).lower()
+        force_cuda = os.environ.get('WHISPER_DEVICE', 'auto').lower() == 'cuda'
+        gpu_runtime_issue = any(
+            k in msg for k in ('cublas', 'cudnn', 'nvrtc', 'cuda', 'cudart')
+        )
+        if not force_cuda and gpu_runtime_issue:
+            print(
+                'Whisper failed on GPU ({0}). Reloading on CPU (install CUDA/cuBLAS for GPU).'.format(
+                    e
+                )
+            )
+            whisper_model = _make_whisper('cpu', 'int8')
+            try:
+                chat_now = _transcribe_to_text(file)
+            except Exception as e2:
+                print('Error transcribing audio locally: {0}'.format(e2))
+                return
+        else:
+            print('Error transcribing audio locally: {0}'.format(e))
+            return
+    print('Question: ' + chat_now)
     result = owner_name + ' said ' + chat_now
     conversation.append({'role': 'user', 'content': result})
     openai_answer()

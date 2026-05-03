@@ -1,5 +1,6 @@
 alkana
 emoji
+faster-whisper
 httpx>=0.28.0
 deep-translator
 langdetect
