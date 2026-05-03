@@ -1,6 +1,9 @@
 alkana
 emoji
-googletrans==4.0.0rc1
+faster-whisper
+httpx>=0.28.0
+deep-translator
+langdetect
 keyboard
 mecab-python3
 openai
