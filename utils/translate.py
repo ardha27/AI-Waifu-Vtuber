@@ -1,7 +1,8 @@
 import requests
 import json
 import sys
-import googletrans
+from deep_translator import GoogleTranslator
+from langdetect import detect, LangDetectException
 
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
@@ -36,19 +37,19 @@ def translate_deeplx(text, source, target):
 
 def translate_google(text, source, target):
     try:
-        translator = googletrans.Translator()
-        result = translator.translate(text, src=source, dest=target)
-        return result.text
-    except:
+        src = (source or 'auto').lower()
+        dest = (target or 'en').lower()
+        return GoogleTranslator(source=src, target=dest).translate(text)
+    except Exception:
         print("Error translate")
         return
-    
+
 def detect_google(text):
     try:
-        translator = googletrans.Translator()
-        result = translator.detect(text)
-        return result.lang.upper()
-    except:
+        if not text or not str(text).strip():
+            return
+        return detect(text).upper()
+    except LangDetectException:
         print("Error detect")
         return
 
