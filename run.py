@@ -1,5 +1,4 @@
 import openai
-import winsound
 import sys
 import pytchat
 import time
@@ -17,6 +16,30 @@ from utils.TTS import *
 from utils.subtitle import *
 from utils.promptMaker import *
 from utils.twitch_config import *
+
+# winsound is only available on Windows, so import it conditionally and fall
+# back to a portable player (pyaudio + wave, already dependencies) on Mac/Linux
+try:
+    import winsound
+
+    def play_audio(filename):
+        winsound.PlaySound(filename, winsound.SND_FILENAME)
+except ImportError:
+    def play_audio(filename):
+        wf = wave.open(filename, 'rb')
+        p = pyaudio.PyAudio()
+        stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                        channels=wf.getnchannels(),
+                        rate=wf.getframerate(),
+                        output=True)
+        data = wf.readframes(1024)
+        while data:
+            stream.write(data)
+            data = wf.readframes(1024)
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+        wf.close()
 
 # to help the CLI write unicode characters to the terminal
 sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
@@ -212,7 +235,7 @@ def translate_text(text):
 
     # is_Speaking is used to prevent the assistant speaking more than one audio at a time
     is_Speaking = True
-    winsound.PlaySound("test.wav", winsound.SND_FILENAME)
+    play_audio("test.wav")
     is_Speaking = False
 
     # Clear the text files after the assistant has finished speaking
