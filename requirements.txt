@@ -1,9 +1,14 @@
 alkana
 emoji
+# googletrans 4.0.0rc1 hard-pins httpx==0.13.3
 googletrans==4.0.0rc1
 keyboard
 mecab-python3
-openai
+# The code uses the legacy openai API (openai.ChatCompletion, openai.Audio).
+# These were removed in openai>=1.0, and 1.x pulls in a newer httpx that
+# conflicts with googletrans. 0.28.1 is the last 0.x release and uses
+# requests instead of httpx, so it has no conflict.
+openai==0.28.1
 pandas
 PyAudio
 pytchat
